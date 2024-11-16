@@ -1,18 +1,17 @@
-import mysql.connector
-from mysql.connector import Error
+import psycopg2
+from psycopg2 import Error
 
 class UserDatabase:
     def __init__(self):
         try:
             # db config
-            self.connection = mysql.connector.connect(
+            self.connection = psycopg2.connect(
                 host='localhost',
-                database='db',
-                user='root',
-                password='root'
+                database='postgres',
+                user='postgres',
+                password='postgres'
             )  
-            if self.connection.is_connected():
-                self.cursor = self.connection.cursor()
+            self.cursor = self.connection.cursor()
         except Error as e:
             print(f"connection error: {e}")
 
@@ -21,13 +20,15 @@ class UserDatabase:
     def create_user(self, name, user_name):
         try:
             insert_query = """
-            INSERT INTO user (name, user_name)
+            INSERT INTO users (name, user_name)
             VALUES (%s, %s)
+            RETURNING id
             """
             self.cursor.execute(insert_query, (name, user_name))
+            user_id = self.cursor.fetchone()[0]
             self.connection.commit()
-            print("create success")
-            return self.cursor.lastrowid
+            print("create success") 
+            return user_id
         except Error as e:
             print(f"create failure: {e}")
             return None
@@ -35,7 +36,7 @@ class UserDatabase:
     # Retrieve by user_id
     def get_user_by_id(self, user_id):
         try:
-            select_query = "SELECT * FROM user WHERE id = %s"
+            select_query = "SELECT * FROM users WHERE id = %s"
             self.cursor.execute(select_query, (user_id,))
             user = self.cursor.fetchone()
             return user
@@ -46,7 +47,7 @@ class UserDatabase:
     # Retrieve all
     def get_all_users(self):
         try:
-            select_query = "SELECT * FROM user"
+            select_query = "SELECT * FROM users"
             self.cursor.execute(select_query)
             users = self.cursor.fetchall()
             return users
@@ -72,7 +73,7 @@ class UserDatabase:
                 
             values.append(user_id)
             update_query = f"""
-            UPDATE user 
+            UPDATE users 
             SET {', '.join(update_parts)}
             WHERE id = %s
             """
@@ -88,7 +89,7 @@ class UserDatabase:
     # Delete
     def delete_user(self, user_id):
         try:
-            delete_query = "DELETE FROM user WHERE id = %s"
+            delete_query = "DELETE FROM users WHERE id = %s"
             self.cursor.execute(delete_query, (user_id,))
             self.connection.commit()
             print("delete success")

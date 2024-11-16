@@ -1,18 +1,17 @@
 # python-db
-MySQL CRUD demo for Python
+Postgre CRUD demo for Python
 
 1、Execute SQL script
-CREATE TABLE `user` (
-  `id` bigint(11) NOT NULL AUTO_INCREMENT,
-  `name`varchar(20) NOT NULL,
-  `user_name` varchar(20) NOT NULL,
-  `create_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='user';
-insert into user(name, user_name) values ('David','David'),('Ben','Ben'),('Eden','Eden');
+CREATE TABLE users (
+  id SERIAL NOT NULL ,
+  name varchar(20) NOT NULL,
+  user_name varchar(20) NOT NULL,
+  PRIMARY KEY (id)
+);
+insert into users(name, user_name) values ('David','David'),('Ben','Ben'),('Eden','Eden');
 
 2、Install Python dependency libraries if necessary
-pip install mysql-connector-python
+pip install psycopg2-binary
 
 3、Execute db.py
 for example, execute 'python3 db.py' in the command line
